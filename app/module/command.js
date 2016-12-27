@@ -1,6 +1,8 @@
 "use strict"
+
 const exec = require('child_process').exec,
-      EventEmitter = require('events');
+      EventEmitter = require('events'),
+      path = require('path');
 
 /**
  *  可以执行指定命令。有data事件，terminate事件。
@@ -22,10 +24,10 @@ class Command extends EventEmitter {
     
     exec () {
         this._process = exec(this._opts.cmd, {
-            cwd: this._opts.path
+            cwd: path.resolve(__dirname, '../../', this._opts.path)
         }, (error, stdout, stderr) => {
             if(error) {
-                this.emit("data", error);
+                this.emit("error", error);
             }
             
             this.emit("terminated");
