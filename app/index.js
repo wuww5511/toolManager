@@ -8,25 +8,34 @@ const ipcMain = electron.ipcMain;
 const data = require('./data');
 const exec = require('child_process').exec;
 const dialog = electron.dialog;
+const {Command} = require('./module/command');
+
+var commands = {};
 
 ipcMain.on('exec', function (event, id, cmd) {
+    var command = new Command(cmd);
     
-    const ch = exec(cmd.cmd, {cwd: cmd.path}, ()=> {
-        
-        event.sender.send('callback_exec', {
-            isRunning: false,
-            cmd: cmd,
-            msg: ''
-        });
-    });
-    
-    ch.stdout.on('data', (str) => {
-        event.sender.send('callback_exec', {
-            isRunning: true,
+    command.on('data', (str) => {
+        event.sender.send('callback_exec_data', {
             msg: str,
-            cmd: cmd
+            id: cmd.id
         });
     });
+    
+    command.on('terminated', () => {
+        event.sender.send('callback_exec_end', {
+            id: cmd.id
+        });
+        delete commands[cmd.id];
+    });
+    
+   commands[cmd.id] = command;
+   command.exec();
+       
+});
+
+ipcMain.on('exec_end', function (event, id, cmd) {
+    commands[cmd.id] && commands[cmd.id].kill();
 });
 
 ipcMain.on('read', function (event, id, key) {

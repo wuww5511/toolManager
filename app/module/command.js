@@ -1,3 +1,4 @@
+"use strict"
 const exec = require('child_process').exec,
       EventEmitter = require('events');
 
@@ -26,13 +27,11 @@ class Command extends EventEmitter {
             if(error) {
                 this.emit("data", error);
             }
-            else
-                this.emit("data", stdout);
             
             this.emit("terminated");
         });
         
-        this._process.on('data', (str) => {
+        this._process.stdout.on('data', (str) => {
             this.emit("data", str);
         })
     }

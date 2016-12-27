@@ -56,11 +56,14 @@
     <nav class="nav">
        <div class="container">
            
-            <el-button v-if="$store.state.activeCmd && $store.state.activeCmd.isRunning" @click="onStopBtnClick">停止</el-button>
-            <el-button v-else @click="onStartBtnClick">启动</el-button>
-            <el-button>编辑</el-button>
+            <el-button :disabled="!$store.state.activeCmd" v-if="$store.state.activeCmd && $store.state.activeCmd.isRunning" @click="onStopBtnClick">停止</el-button>
+            <el-button :disabled="!$store.state.activeCmd" v-else @click="onStartBtnClick">启动</el-button>
+            <el-button :disabled="!$store.state.activeCmd">编辑</el-button>
+            <el-button :disabled="!$store.state.activeCmd">清空日志</el-button>
+            <el-button :disabled="!$store.state.activeCmd" @click="onDeleteBtnClick">删除</el-button>
             <el-button @click="onAddBtnClick">新增</el-button>
-            <el-button>删除</el-button>
+            
+            
        </div>
         
     </nav>
@@ -108,7 +111,7 @@ export default {
         };
     },
     created: function () {
-        this.$store.dispatch('update');
+        this.$store.dispatch('getDataFromDisk');
     },
     methods: {
         onAddCmd: function () {
@@ -121,8 +124,12 @@ export default {
             for(var i in this.adlg)
                 this.adlg[i] = '';
         },
+        onDeleteBtnClick: function () {
+            this.$store.dispatch('deleteCmd', this.$store.state.activeCmd.id);
+            this.$message("删除成功");
+        },
         onOperationClick: function (cmd) {
-            this.$store.dispatch('changeActiveCmd', cmd);
+            this.$store.commit("setActiveCmd", cmd);
         },
         onStopBtnClick: function () {
             this.$store.dispatch('stopActiveCmd');
