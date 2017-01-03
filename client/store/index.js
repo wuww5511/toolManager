@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import local from '../../node/data'
 import {ipcRenderer} from 'electron'
-import lib from '../lib'
+import * as lib from '../lib'
 
 
 Vue.use(Vuex)
@@ -27,7 +27,7 @@ const mutations = {
     addLog: ({cmds}, {id, msg}) => {
         for(let i = 0; i < cmds.length; i++) {
             if(cmds[i].id == id) {
-                cmds[i].logs.push(msg);
+                lib.Command.pushLog(cmds[i], msg);
             }
         }
     },

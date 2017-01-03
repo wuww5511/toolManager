@@ -1,1 +1,1 @@
-{"cmds":[]}
+{"cmds":[{"cmd":"mvn clean tomcat7:run","id":"cmd1482891247093","name":"comic_web","path":"/Users/wuww/code/comic_web"},{"cmd":"gulp","id":"cmd1482891664520","name":"comic_web_css","path":"/Users/wuww/code/comic_web/src/main/webapp/src"},{"cmd":"npm run sprites","id":"cmd1482891730786","name":"comic_web_sprites","path":"/Users/wuww/code/comic_web/src/main/webapp/src"},{"cmd":"open /Users/wuww/code/comic_web/src/main/webapp","id":"cmd1482891852182","name":"comic_web_open","path":"/Users/wuww/code/comic_web/src/main/webapp/src"}]}

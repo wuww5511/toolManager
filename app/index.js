@@ -29,6 +29,17 @@ ipcMain.on('exec', function (event, id, cmd) {
         delete commands[cmd.id];
     });
     
+    command.on('error', (err) => {
+        event.sender.send('callback_exec_data', {
+            msg: err,
+            id: cmd.id
+        });
+        event.sender.send('callback_exec_end', {
+            id: cmd.id
+        });
+        delete commands[cmd.id];
+    });
+    
    commands[cmd.id] = command;
    command.exec();
        

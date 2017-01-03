@@ -24,15 +24,18 @@
     .operation{
         position: absolute;
         left: 0;
-        width: 140px;
+        width: 200px;
         height: 100%;
         border-right: 1px solid #ccc;
     }
     .info{
         position: absolute;
-        left: 140px;
+        left: 200px;
         right: 0;
-        height: 100%
+        height: 100%;
+        overflow: auto;
+        padding: 10px;
+        box-sizing: border-box;
     }
     .cmdDlg .el-row + .el-row{
         margin-top: 10px;

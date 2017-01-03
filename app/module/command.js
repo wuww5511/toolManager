@@ -27,7 +27,7 @@ class Command extends EventEmitter {
             cwd: path.resolve(__dirname, '../../', this._opts.path)
         }, (error, stdout, stderr) => {
             if(error) {
-                this.emit("error", error);
+                this.emit("error", error.message);
             }
             
             this.emit("terminated");
