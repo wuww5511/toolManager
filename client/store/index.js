@@ -16,6 +16,15 @@ const mutations = {
     addCmd: (state, data) => {
         state.cmds.push(new lib.Command(data));
     },
+    editCmd: (state, data) => {
+        var cmds = state.cmds;
+        for(let i = 0; i < cmds.length; i++) {
+            if(cmds[i].id == data.id) {
+                Object.assign(cmds[i], data);
+                break;
+            }
+        }
+    },
     deleteCmd: ({cmds}, id) => {
         for(let i = 0; i < cmds.length; i++) {
             if(cmds[i].id == id) {
@@ -30,6 +39,9 @@ const mutations = {
                 lib.Command.pushLog(cmds[i], msg);
             }
         }
+    },
+    clearLogs: (state) => {
+        state.activeCmd.logs = [];
     },
     clearCmds: (state) => {
         state.cmds = [];
@@ -73,6 +85,9 @@ const actions = {
         commit('addCmd', data);
         commit('refreshActiveCmd');
         dispatch('update2disk');
+    },
+    editCmd: ({commit, dispatch}, data) => {
+        commit('editCmd', data);
     },
     deleteCmd: ({commit, dispatch}, id) => {
         commit("deleteCmd", id);

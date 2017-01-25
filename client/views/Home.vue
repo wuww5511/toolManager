@@ -1,4 +1,4 @@
-<style scoped>
+<style>
     .nav{
         position: absolute;
         top: 0;
@@ -58,15 +58,12 @@
  <div>
     <nav class="nav">
        <div class="container">
-           
             <el-button :disabled="!$store.state.activeCmd" v-if="$store.state.activeCmd && $store.state.activeCmd.isRunning" @click="onStopBtnClick">停止</el-button>
             <el-button :disabled="!$store.state.activeCmd" v-else @click="onStartBtnClick">启动</el-button>
-            <el-button :disabled="!$store.state.activeCmd">编辑</el-button>
-            <el-button :disabled="!$store.state.activeCmd">清空日志</el-button>
+            <el-button :disabled="!$store.state.activeCmd" @click="onEditBtnClick">编辑</el-button>
+            <el-button :disabled="!$store.state.activeCmd" @click="onClearLogs">清空日志</el-button>
             <el-button :disabled="!$store.state.activeCmd" @click="onDeleteBtnClick">删除</el-button>
             <el-button @click="onAddBtnClick">新增</el-button>
-            
-            
        </div>
         
     </nav>
@@ -74,31 +71,21 @@
         <div class="operation">
             <div :class="{oitem: true, active: cmd.id == $store.state.activeCmd.id}" v-for="cmd in $store.state.cmds" @click="onOperationClick(cmd)">{{cmd.name}}</div>
         </div>
-        <div class="info">
+        <div class="info" ref="info">
            <template v-if="$store.state.activeCmd">
                <div v-for="log in $store.state.activeCmd.logs">{{log}}</div>
            </template>
             
         </div>
     </div>
-    <el-dialog title="添加命令" v-model="showAdlg" custom-class="cmdDlg">
-        <el-row>
-            <el-input placeholder="请输入名称" v-model="adlg.name"></el-input>
-        </el-row>
-        <el-row>
-            <el-input placeholder="请输入命令" v-model="adlg.cmd"></el-input>
-        </el-row>
-        <el-row>
-            <el-input placeholder="请输入执行路径" v-model="adlg.path"></el-input>
-        </el-row>
-        <el-row>
-            <el-button @click="onAddCmd">添加命令</el-button>
-        </el-row>
-    </el-dialog>
+    <CmdDlg :data="adlg" v-model="showAdlg" @add="onAddCmd" @edit="onEditCmd" />
+    
  </div>
 </template>
 
 <script>
+import CmdDlg from "../components/CmdDlg"
+
 export default {
     data () {
         return {
@@ -108,28 +95,60 @@ export default {
             adlg: {
                 name: '',
                 cmd: '',
-                path: ''
+                path: '',
+                id: ''
             },
             showAdlg: false
         };
     },
+    components: {
+        CmdDlg
+    },
     created: function () {
         this.$store.dispatch('getDataFromDisk');
     },
+    watch: {
+        "$store.state.activeCmd.logs": function () {
+            
+            this.$nextTick(() => {
+                var container = this.$refs.info;
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+    },
     methods: {
-        onAddCmd: function () {
-            this.$store.dispatch('addCmd', this.adlg);
-            this.$message("添加成功");
-            this.showAdlg = false;
+        onDlgSave: function () {
+            if(this.adlg.id)
+                this.doAddCmd();
+            else
+                this.doEditCmd();
         },
         onAddBtnClick: function () {
             this.showAdlg = true;
-            for(var i in this.adlg)
-                this.adlg[i] = '';
+            this.adlg = Object.assign({}, {
+                id: '',
+                name: '',
+                path: '',
+                cmd: ''
+            })
+        },
+        onEditBtnClick: function () {
+            this.showAdlg = true;
+            var activeCmd = this.$store.state.activeCmd;
+            this.adlg = Object.assign({}, {
+                id: activeCmd.id,
+                name: activeCmd.name,
+                path: activeCmd.path,
+                cmd: activeCmd.cmd
+            })
         },
         onDeleteBtnClick: function () {
             this.$store.dispatch('deleteCmd', this.$store.state.activeCmd.id);
             this.$message("删除成功");
+        },
+        onClearLogs: function () {
+            this.$store.commit("clearLogs");
+            this.$message("清除成功");
         },
         onOperationClick: function (cmd) {
             this.$store.commit("setActiveCmd", cmd);
@@ -139,6 +158,16 @@ export default {
         },
         onStartBtnClick: function () {
             this.$store.dispatch('startActiveCmd');
+        },
+        onAddCmd: function (data) {
+            this.$store.dispatch('addCmd', data);
+            this.$message("保存成功");
+            this.showAdlg = false;
+        },
+        onEditCmd: function (data) {
+            this.$store.dispatch('editCmd', data);
+            this.$message("保存成功");
+            this.showAdlg = false;
         }
     }
 }
