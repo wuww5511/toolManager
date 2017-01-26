@@ -97,7 +97,7 @@ const actions = {
     getDataFromDisk: ({commit}) => {
         local.get('cmds', function (data) {
             commit("clearCmds")
-            
+            data = data || [];
             for(let i = 0; i < data.length; i++) 
                 commit('addCmd', data[i]);
             
