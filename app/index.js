@@ -12,29 +12,51 @@ const {Command} = require('./module/command');
 
 var commands = {};
 
-ipcMain.on('exec', function (event, id, cmd) {
+var server = require('./main/server')();
+
+server.register("alert", (callback, str) => {
+    dialog.showMessageBox({
+        message: str,
+        buttons: ["我知道了！"]
+    }, (res) => {
+        callback(res);
+    });
+});
+
+server.register("select_path", (callback, opts) => {
+    opts = opts || {};
+    dialog.showOpenDialog(Object.assign({}, opts), callback);
+});
+
+/**
+ *  @param callback {Function}
+ *  @param data {Object}
+ *      - cmd {String} 
+ */
+server.register("exec", (callback, cmd) => {
+    
     var command = new Command(cmd);
     
     command.on('data', (str) => {
-        event.sender.send('callback_exec_data', {
+        server.broadcast("exec_data", {
             msg: str,
             id: cmd.id
-        });
+        })
     });
     
     command.on('terminated', () => {
-        event.sender.send('callback_exec_end', {
+        server.broadcast("exec_terminated", {
             id: cmd.id
         });
         delete commands[cmd.id];
     });
     
     command.on('error', (err) => {
-        event.sender.send('callback_exec_data', {
+        server.broadcast("exec_data", {
             msg: err,
             id: cmd.id
-        });
-        event.sender.send('callback_exec_end', {
+        })
+        server.broadcast("exec_terminated", {
             id: cmd.id
         });
         delete commands[cmd.id];
@@ -42,22 +64,21 @@ ipcMain.on('exec', function (event, id, cmd) {
     
    commands[cmd.id] = command;
    command.exec();
-       
 });
 
-ipcMain.on('exec_end', function (event, id, cmd) {
+server.register('exec_end', function (callback, cmd) {
     commands[cmd.id] && commands[cmd.id].kill();
 });
 
-ipcMain.on('read', function (event, id, key) {
-    var tmp = data.get(key);
-    event.sender.send('callback_read_' + id, tmp);
+server.register("write", (callback, opts) => {
+    data.set(opts.key, opts.value);
+    callback(true);
+});
+server.register("read", (callback, opts) => {
+    callback(data.get(opts.key)); 
 });
 
-ipcMain.on('write', function (event, id, key, o) {
-    data.set(key, o);
-    event.sender.send('callback_write_' + id, true);
-});
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -73,12 +94,13 @@ if (isDev) {
 }
 
 function createWindow() {
+    var clientId = `client_${+new Date()}`;
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
 
   // and load the index.html of the app.
   const url = isDev ? `http://localhost:${config.port}` : `file://${__dirname}/dist/index.html`
-  mainWindow.loadURL(url)
+  mainWindow.loadURL(url + `?id=${clientId}`);
 
   // Open the DevTools.
   if (isDev) {
@@ -96,6 +118,8 @@ function createWindow() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
+    
+    server.removeClient(clientId);
   })
 }
 

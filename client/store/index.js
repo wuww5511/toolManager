@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import local from '../../node/data'
+import local from '../data'
 import {ipcRenderer} from 'electron'
 import * as lib from '../lib'
+import * as bridge from "../bridge"
 
 
 Vue.use(Vuex)
@@ -109,14 +110,13 @@ const actions = {
     startActiveCmd: ({commit, state}) => {
         if(state.activeCmd.isRunning) return;
         
-        var id = +new Date();
         commit("setCmdStart", state.activeCmd.id);
-        ipcRenderer.send('exec', id, state.activeCmd);
+        bridge.trigger("exec", state.activeCmd);
         
     },
     stopActiveCmd: ({commit, state}) => {
         if(!state.activeCmd.isRunning) return;
-        ipcRenderer.send('exec_end', +new Date(), state.activeCmd);
+        bridge.trigger("exec_end", state.activeCmd);
     }
 }
 
@@ -126,15 +126,15 @@ const store = new Vuex.Store({
     actions
 })
 
-ipcRenderer.on('callback_exec_data', function (event, {msg, id}) {
-   store.commit("addLog", {
+bridge.on('exec_data', ({msg, id}) => {
+    store.commit("addLog", {
        id,
        msg
-   })
+   });
 });
 
-ipcRenderer.on('callback_exec_end', function (event, {id}) {
-   store.commit("setCmdStop", id);
+bridge.on('exec_terminated', ({id}) => {
+    store.commit("setCmdStop", id);
 });
 
 export default store
