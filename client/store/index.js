@@ -89,6 +89,7 @@ const actions = {
     },
     editCmd: ({commit, dispatch}, data) => {
         commit('editCmd', data);
+        dispatch('update2disk');
     },
     deleteCmd: ({commit, dispatch}, id) => {
         commit("deleteCmd", id);

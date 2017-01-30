@@ -9,7 +9,7 @@ const data = require('./data');
 const exec = require('child_process').exec;
 const dialog = electron.dialog;
 const {Command} = require('./module/command');
-
+require('fix-path')();
 var commands = {};
 
 var server = require('./main/server')();

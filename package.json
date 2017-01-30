@@ -4,11 +4,11 @@
   "description": "My Superb Vue Project",
   "main": "client/index.js",
   "scripts": {
-    "test": "echo lol",
     "build": "webpack --config build/webpack.prod.js",
     "dev": "node build/server.js",
     "app": "cross-env NODE_ENV=development electron app/",
-    "lint": "eslint client/* app/* --ext .js --ext .vue"
+    "lint": "eslint client/* app/* --ext .js --ext .vue",
+    "test": "electron-packager ./app test --overwrite"  
   },
   "author": "wuwweiwei <wuww5511@126.com>",
   "license": "MIT",
