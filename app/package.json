@@ -4,8 +4,6 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "electron-sudo": "^4.0.12",
-    "fix-path": "^2.1.0",
-    "sudo-prompt": "^6.2.1"
+    "fix-path": "^2.1.0"
   }
 }
