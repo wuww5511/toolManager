@@ -26,13 +26,18 @@ const mutations = {
             }
         }
     },
-    deleteCmd: ({cmds}, id) => {
+    deleteCmd: (state, id) => {
+        var cmds = state.cmds;
         for(let i = 0; i < cmds.length; i++) {
             if(cmds[i].id == id) {
                 cmds.splice(i, 1);
                 break;
             }
         }
+        if(state.activeCmd.id == id) {
+            state.activeCmd = null;
+        }
+        
     },
     addLog: ({cmds}, {id, msg}) => {
         for(let i = 0; i < cmds.length; i++) {
@@ -91,7 +96,8 @@ const actions = {
         commit('editCmd', data);
         dispatch('update2disk');
     },
-    deleteCmd: ({commit, dispatch}, id) => {
+    deleteCmd: ({commit, dispatch, state}, id) => {
+        bridge.trigger("exec_end", state.activeCmd);
         commit("deleteCmd", id);
         commit('refreshActiveCmd');
         dispatch('update2disk');
