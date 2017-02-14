@@ -37,6 +37,10 @@
         padding: 10px;
         box-sizing: border-box;
     }
+    .info p{
+        margin: 5px;
+        white-space: nowrap;
+    }
     .cmdDlg .el-row + .el-row{
         margin-top: 10px;
     }
@@ -73,7 +77,7 @@
         </div>
         <div class="info" ref="info">
            <template v-if="$store.state.activeCmd">
-               <div v-for="log in $store.state.activeCmd.logs">{{log}}</div>
+               <p v-for="log in $store.state.activeCmd.logs">{{log}}</p>
            </template>
             
         </div>

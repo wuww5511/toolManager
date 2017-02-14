@@ -56,9 +56,6 @@ server.register("exec", (callback, cmd) => {
             msg: err,
             id: cmd.id
         })
-        server.broadcast("exec_terminated", {
-            id: cmd.id
-        });
         delete commands[cmd.id];
     });
     

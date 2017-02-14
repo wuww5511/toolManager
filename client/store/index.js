@@ -136,6 +136,10 @@ bridge.on('exec_data', ({msg, id}) => {
 
 bridge.on('exec_terminated', ({id}) => {
     store.commit("setCmdStop", id);
+    store.commit("addLog", {
+       id,
+       msg: "\n--------------------\n-------end----------\n--------------------\n"
+   });
 });
 
 export default store
