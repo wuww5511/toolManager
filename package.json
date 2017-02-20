@@ -8,11 +8,14 @@
     "dev": "node build/server.js",
     "app": "cross-env NODE_ENV=development electron app/",
     "lint": "eslint client/* app/* --ext .js --ext .vue",
-    "test": "electron-packager ./app test --overwrite"  
+    "pack": "electron-packager ./app test --overwrite",
+    "debug": ""
   },
   "author": "wuwweiwei <wuww5511@126.com>",
   "license": "MIT",
   "dependencies": {
+    "electron-inspector": "^0.1.4",
+    "electron-rebuild": "^1.5.7",
     "element-ui": "^1.0.8",
     "promise-polyfill": "^6.0.2",
     "vue": "^2.1.0",
